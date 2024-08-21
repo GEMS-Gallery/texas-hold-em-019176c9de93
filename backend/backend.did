@@ -1,0 +1,12 @@
+type Card = 
+ record {
+   suit: text;
+   value: nat;
+ };
+service : {
+  evaluateHands: () -> (text);
+  initGame: () -> (text);
+  placeBet: (nat) -> (text);
+  revealCommunityCards: () -> (text);
+  shuffleDeck: (vec Card) -> (vec Card);
+}
