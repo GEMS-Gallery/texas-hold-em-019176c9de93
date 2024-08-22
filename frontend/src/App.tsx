@@ -10,16 +10,31 @@ const StyledCard = styled(Card)(({ theme }) => ({
   padding: theme.spacing(2),
 }));
 
+interface GameState {
+  playerHand: Card[];
+  communityCards: Card[];
+  playerChips: bigint;
+  currentBet: bigint;
+  stage: string;
+}
+
+interface Card {
+  suit: string;
+  value: number;
+}
+
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<string>('');
   const [betAmount, setBetAmount] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [revealedCards, setRevealedCards] = useState<Card[]>([]);
 
   const initGame = async () => {
     setLoading(true);
     try {
       const result = await backend.initGame();
       setGameState(result);
+      setRevealedCards([]);
     } catch (error) {
       console.error('Error initializing game:', error);
     } finally {
@@ -45,6 +60,7 @@ const App: React.FC = () => {
     try {
       const result = await backend.revealCommunityCards();
       setGameState(result);
+      await updateGameState();
     } catch (error) {
       console.error('Error revealing community cards:', error);
     } finally {
@@ -64,6 +80,27 @@ const App: React.FC = () => {
     }
   };
 
+  const updateGameState = async () => {
+    try {
+      const currentGameState = await backend.getGameState();
+      if (currentGameState) {
+        setRevealedCards(currentGameState.communityCards);
+      }
+    } catch (error) {
+      console.error('Error fetching game state:', error);
+    }
+  };
+
+  const cardToString = (card: Card) => {
+    const valueStr = {
+      11: 'Jack',
+      12: 'Queen',
+      13: 'King',
+      14: 'Ace',
+    }[card.value] || card.value.toString();
+    return `${valueStr} of ${card.suit}`;
+  };
+
   return (
     <Container maxWidth="sm">
       <Typography variant="h2" component="h1" gutterBottom align="center">
@@ -75,6 +112,18 @@ const App: React.FC = () => {
             Game State
           </Typography>
           <Typography variant="body1">{gameState}</Typography>
+        </CardContent>
+      </StyledCard>
+      <StyledCard>
+        <CardContent>
+          <Typography variant="h6" component="h2" gutterBottom>
+            Revealed Community Cards
+          </Typography>
+          <Typography variant="body1">
+            {revealedCards.length > 0
+              ? revealedCards.map(cardToString).join(', ')
+              : 'No cards revealed yet'}
+          </Typography>
         </CardContent>
       </StyledCard>
       <Box display="flex" flexDirection="column" alignItems="center">

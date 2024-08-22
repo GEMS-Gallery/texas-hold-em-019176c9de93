@@ -107,18 +107,22 @@ actor TexasHoldem {
       case (?game) {
         var newCommunityCards = game.communityCards;
         var newStage = game.stage;
+        var newlyRevealed: [Card] = [];
 
         switch (game.stage) {
           case ("preflop") {
-            newCommunityCards := Array.append(newCommunityCards, [deck[2], deck[3], deck[4]]);
+            newlyRevealed := [deck[2], deck[3], deck[4]];
+            newCommunityCards := Array.append(newCommunityCards, newlyRevealed);
             newStage := "flop";
           };
           case ("flop") {
-            newCommunityCards := Array.append(newCommunityCards, [deck[5]]);
+            newlyRevealed := [deck[5]];
+            newCommunityCards := Array.append(newCommunityCards, newlyRevealed);
             newStage := "turn";
           };
           case ("turn") {
-            newCommunityCards := Array.append(newCommunityCards, [deck[6]]);
+            newlyRevealed := [deck[6]];
+            newCommunityCards := Array.append(newCommunityCards, newlyRevealed);
             newStage := "river";
           };
           case (_) { return "All community cards have been revealed." };
@@ -132,7 +136,7 @@ actor TexasHoldem {
           stage = newStage;
         };
 
-        "Community cards: " # cardsToString(newCommunityCards)
+        "Newly revealed cards: " # cardsToString(newlyRevealed) # "\nAll community cards: " # cardsToString(newCommunityCards)
       };
     }
   };
@@ -161,6 +165,10 @@ actor TexasHoldem {
         result
       };
     }
+  };
+
+  public query func getGameState(): async ?GameState {
+    currentGame
   };
 
   func evaluateHand(hand: [Card]): Nat {

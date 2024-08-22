@@ -1,3 +1,11 @@
+type GameState = 
+ record {
+   communityCards: vec Card;
+   currentBet: nat;
+   playerChips: nat;
+   playerHand: vec Card;
+   stage: text;
+ };
 type Card = 
  record {
    suit: text;
@@ -5,6 +13,7 @@ type Card =
  };
 service : {
   evaluateHands: () -> (text);
+  getGameState: () -> (opt GameState) query;
   initGame: () -> (text);
   placeBet: (nat) -> (text);
   revealCommunityCards: () -> (text);

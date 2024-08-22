@@ -3,8 +3,16 @@ import type { ActorMethod } from '@dfinity/agent';
 import type { IDL } from '@dfinity/candid';
 
 export interface Card { 'value' : bigint, 'suit' : string }
+export interface GameState {
+  'playerChips' : bigint,
+  'communityCards' : Array<Card>,
+  'stage' : string,
+  'playerHand' : Array<Card>,
+  'currentBet' : bigint,
+}
 export interface _SERVICE {
   'evaluateHands' : ActorMethod<[], string>,
+  'getGameState' : ActorMethod<[], [] | [GameState]>,
   'initGame' : ActorMethod<[], string>,
   'placeBet' : ActorMethod<[bigint], string>,
   'revealCommunityCards' : ActorMethod<[], string>,
